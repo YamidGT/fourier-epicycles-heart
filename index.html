@@ -32,7 +32,7 @@
     .controls .item { background: var(--panel); border-radius: 14px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.08); }
     label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
     input[type="range"] { width: 100%; }
-    .row { display: flex; gap: 12px; align-items: center; }
+    .row { display: flex; gap: 8px; align-items: center; }
     .badge { font-variant-numeric: tabular-nums; background: rgba(94,234,212,0.15); border: 1px solid rgba(94,234,212,0.35); color: var(--accent); padding: 3px 8px; border-radius: 999px; font-size: 12px; }
     canvas { width: 100%; height: auto; display: block; background: #0a0f14; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); }
     .legend { display:flex; gap:16px; align-items:center; font-size: 12px; color: var(--muted); margin-top: 8px; }
@@ -40,8 +40,9 @@
     .dot.circ { background: #9ca3af; }
     .dot.vec { background: var(--accent); }
     .dot.trace { background: var(--trace); }
-    button { cursor:pointer; background: var(--panel); color: var(--text); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px; }
+    button { cursor:pointer; background: var(--panel); color: var(--text); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 6px 10px; }
     button:hover { filter: brightness(1.1); }
+    .arrow-btn { width: 28px; height: 28px; display:flex; align-items:center; justify-content:center; font-size:14px; }
   </style>
 </head>
 <body>
@@ -51,15 +52,19 @@
       <div class="item">
         <label for="armonicos">Número de vectores (armónicos)</label>
         <div class="row">
+          <button class="arrow-btn" id="menosArmonicos">➖</button>
           <input id="armonicos" type="range" min="1" max="200" value="60" />
+          <button class="arrow-btn" id="masArmonicos">➕</button>
           <span class="badge" id="valorArmonicos">60</span>
         </div>
       </div>
       <div class="item">
         <label for="velocidad">Velocidad</label>
         <div class="row">
-          <input id="velocidad" type="range" min="0.1" max="3" value="1" step="0.1" />
-          <span class="badge" id="valorVelocidad">1.0×</span>
+          <button class="arrow-btn" id="menosVelocidad">➖</button>
+          <input id="velocidad" type="range" min="0.1" max="3" value="0.2" step="0.1" />
+          <button class="arrow-btn" id="masVelocidad">➕</button>
+          <span class="badge" id="valorVelocidad">0.2×</span>
         </div>
       </div>
       <div class="item" style="display:grid; grid-template-columns: auto auto; gap:8px; align-items:center;">
@@ -248,6 +253,7 @@
     requestAnimationFrame(bucle);
 
     // UI
+// UI
     const armonicosInp = document.getElementById('armonicos');
     const valorArmonicos = document.getElementById('valorArmonicos');
     const velocidadInp = document.getElementById('velocidad');
@@ -255,10 +261,15 @@
     const btnPausar = document.getElementById('pausarReproducir');
     const btnReiniciar = document.getElementById('reiniciar');
 
+    // Botones extra
+    const btnMenosArmonicos = document.getElementById('menosArmonicos');
+    const btnMasArmonicos = document.getElementById('masArmonicos');
+    const btnMenosVelocidad = document.getElementById('menosVelocidad');
+    const btnMasVelocidad = document.getElementById('masVelocidad');
+
     armonicosInp.addEventListener('input', e=>{
       numArmonicos = parseInt(e.target.value,10);
       valorArmonicos.textContent = numArmonicos;
-      // reiniciar trazo para ver la nueva convergencia
       trazo.length = 0;
     });
 
@@ -274,6 +285,25 @@
 
     btnReiniciar.addEventListener('click', ()=>{
       t = 0; trazo.length = 0;
+    });
+
+    // Eventos de flechas
+    btnMenosArmonicos.addEventListener('click', ()=>{
+      armonicosInp.value = Math.max(1, parseInt(armonicosInp.value)-1);
+      armonicosInp.dispatchEvent(new Event('input'));
+    });
+    btnMasArmonicos.addEventListener('click', ()=>{
+      armonicosInp.value = Math.min(200, parseInt(armonicosInp.value)+1);
+      armonicosInp.dispatchEvent(new Event('input'));
+    });
+
+    btnMenosVelocidad.addEventListener('click', ()=>{
+      velocidadInp.value = Math.max(0.1, (parseFloat(velocidadInp.value)-0.1).toFixed(1));
+      velocidadInp.dispatchEvent(new Event('input'));
+    });
+    btnMasVelocidad.addEventListener('click', ()=>{
+      velocidadInp.value = Math.min(3, (parseFloat(velocidadInp.value)+0.1).toFixed(1));
+      velocidadInp.dispatchEvent(new Event('input'));
     });
   </script>
 </body>
